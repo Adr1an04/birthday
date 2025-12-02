@@ -143,8 +143,8 @@ const Sandbox = () => {
 
         return {
             ...grain,
-            position: [x, y, z],
-            velocity: [vx, vy, vz]
+            position: [x, y, z] as [number, number, number],
+            velocity: [vx, vy, vz] as [number, number, number]
         };
       });
 
