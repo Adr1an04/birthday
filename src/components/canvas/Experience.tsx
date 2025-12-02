@@ -195,6 +195,7 @@ const FloatingLanterns = () => {
 
   useFrame((state) => {
       if (!mesh.current) return;
+      const currentMesh = mesh.current;
       const time = state.clock.elapsedTime;
       
       initialPositions.forEach((pos, i) => {
@@ -207,9 +208,9 @@ const FloatingLanterns = () => {
           dummy.scale.set(scale, scale, scale);
           
           dummy.updateMatrix();
-          mesh.current.setMatrixAt(i, dummy.matrix);
+          currentMesh.setMatrixAt(i, dummy.matrix);
       });
-      mesh.current.instanceMatrix.needsUpdate = true;
+      currentMesh.instanceMatrix.needsUpdate = true;
   });
 
   return (
