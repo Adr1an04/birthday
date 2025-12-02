@@ -167,7 +167,7 @@ const Fireflies = () => {
   return (
     <points ref={ref}>
       <bufferGeometry>
-        <bufferAttribute attach="attributes-position" count={count} array={positions} itemSize={3} />
+        <bufferAttribute attach="attributes-position" count={count} array={positions} itemSize={3} args={[positions, 3]} />
       </bufferGeometry>
       <pointsMaterial size={0.15} color="#ffffaa" transparent opacity={0.6} sizeAttenuation depthWrite={false} />
     </points>
