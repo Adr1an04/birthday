@@ -9,7 +9,6 @@ import * as THREE from 'three';
 
 let introMusic: Howl | null = null;
 let mainMusic: Howl | null = null;
-let transitionScheduled = false;
 
 export function Candle(props: any) {
   const group = useRef<THREE.Group>(null)
@@ -19,6 +18,7 @@ export function Candle(props: any) {
   const [isLit, setIsLit] = useState(false);
   const setPhase = useStore((state) => state.setPhase);
   const setAudioPlaying = useStore((state) => state.setAudioPlaying);
+  const setCandleLit = useStore((state) => state.setCandleLit);
 
   useEffect(() => {
     const unlockAudio = () => {
@@ -33,8 +33,16 @@ export function Candle(props: any) {
       console.log("Initializing Intro Music...");
       introMusic = new Howl({
         src: ['/song.mp3'],
-        volume: 0,
+        volume: 0.6,
         html5: true,
+        onend: () => {
+          console.log("Intro song ended. Playing main music...");
+          if (mainMusic) {
+            mainMusic.seek(2);
+            mainMusic.volume(0.8);
+            mainMusic.play();
+          }
+        },
         onloaderror: (id, err) => console.error('Intro music load error:', err),
         onplayerror: (id, err) => {
            console.error('Intro music play error:', err);
@@ -48,7 +56,7 @@ export function Candle(props: any) {
       mainMusic = new Howl({
         src: ['/instrumentalsong.mp3'],
         loop: true,
-        volume: 0,
+        volume: 0.8,
         html5: true,
         preload: true, 
         onload: () => console.log("Main music loaded successfully."),
@@ -82,75 +90,20 @@ export function Candle(props: any) {
     
     console.log("Igniting candle...");
     setIsLit(true);
+    setCandleLit(true);
     setAudioPlaying(true);
     
     if (Howler.ctx.state === 'suspended') {
       Howler.ctx.resume().then(() => {
         console.log("Audio context resumed");
-        playIntro();
+        if (introMusic) {
+          introMusic.play();
+        }
       });
     } else {
-        playIntro();
-    }
-
-    function playIntro() {
-        if (introMusic) {
-          console.log("Playing intro music...");
-          introMusic.volume(0.6); 
-          introMusic.play();
-          introMusic.fade(0, 0.6, 1000);
-
-          if (introMusic.state() === 'loaded') {
-              scheduleCrossfade(introMusic.duration());
-          } else {
-              introMusic.once('load', () => {
-                if (introMusic) scheduleCrossfade(introMusic.duration());
-              });
-          }
-
-        } else {
-          console.error("Intro music not initialized");
-        }
-    }
-
-    function scheduleCrossfade(duration: number) {
-        if (transitionScheduled) return;
-        transitionScheduled = true;
-
-        const crossfadeDuration = 2;
-        const timeUntilTrigger = (duration - crossfadeDuration) * 1000;
-
-        console.log(`Song duration: ${duration}s. Triggering crossfade in ${timeUntilTrigger}ms`);
-
-        setTimeout(() => {
-            console.log(">>> CROSSFADE START <<<");
-            
-            introMusic?.fade(0.6, 0, crossfadeDuration * 1000);
-
-            if (mainMusic) {
-                if (mainMusic.state() === 'loaded') {
-                    startMain();
-                } else {
-                    mainMusic.once('load', startMain);
-                }
-            }
-        }, timeUntilTrigger);
-    }
-
-    function startMain() {
-         console.log("Starting Main Music...");
-         if (!mainMusic) return;
-         
-         if (mainMusic.state() === 'unloaded') {
-            mainMusic.load();
-         }
-
-         mainMusic.seek(2); 
-         mainMusic.volume(0);
-         const id = mainMusic.play();
-         console.log("Main music play ID:", id);
-         
-         mainMusic.fade(0, 0.8, 2000, id);
+      if (introMusic) {
+        introMusic.play();
+      }
     }
 
     setTimeout(() => {
@@ -204,9 +157,9 @@ export function Candle(props: any) {
                {isLit && (
                   <pointLight 
                     color="#ffaa00" 
-                    distance={8} 
+                    distance={12} 
                     decay={2} 
-                    intensity={2} 
+                    intensity={8} 
                     position={[0, 2, 0]} 
                   />
                )}
