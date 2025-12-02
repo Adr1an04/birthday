@@ -27,7 +27,7 @@ const Sandbox = () => {
   const lastAddTime = useRef(0);
   
   // Sandbox configuration
-  const sandboxPosValues = [-9, .74, 8.5]; // Used for group position
+  const sandboxPosValues: [number, number, number] = [-9, .74, 8.5]; // Used for group position
   const sandboxSize = 6; 
   const sandboxHeight = 0.5;
   const grainSize = 0.06;
